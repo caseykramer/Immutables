@@ -53,11 +53,6 @@ namespace Immutables.Collections
             get { return new List<T>(); }
         }
 
-        public static List<T> New(params T[] args)
-        {
-            return new List<T>(args);
-        }
-
         public List<T> this[int start, int end]
         {
             get

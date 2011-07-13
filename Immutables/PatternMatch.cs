@@ -5,42 +5,6 @@ using System.Text;
 
 namespace Immutables
 {
-    public class PatternMatch<T,TResult>
-    {
-        private readonly T _value;
-        private readonly List<Tuple<Predicate<T>, Func<T, TResult>>> _cases = new List<Tuple<Predicate<T>, Func<T, TResult>>>();
-        private Func<T, TResult> _elseFunc;
-
-        public PatternMatch(T value)
-        {
-            _value = value;
-        }
-
-        public PatternMatch<T, TResult> With(Predicate<T> condition, Func<T, TResult> result)
-        {
-            _cases.Add(Tuple.Create(condition, result));
-            return this;
-        }
-
-        public PatternMatch<T, TResult> Else(Func<T, TResult> result)
-        {
-            if(_elseFunc != null)
-                throw new InvalidOperationException("Cannot have more than one else condition");
-            _elseFunc = result;
-            return this;
-        }
-
-        public TResult Do()
-        {
-            if (_elseFunc != null)
-                _cases.Add(Tuple.Create<Predicate<T>, Func<T, TResult>>(x => true, _elseFunc));
-            foreach (var item in _cases)
-                if (item.Item1(_value))
-                    return item.Item2(_value);
-
-            throw new MatchNotFoundException("Incomplete pattern match");
-        }
-    }
 
     public class MatchNotFoundException : Exception
     {
@@ -48,27 +12,78 @@ namespace Immutables
         {}
     }
 
-    public class PatternMatchContext<T>
+    public interface IPatternAction<out T, in TResult>
     {
-        private readonly T _value;
-
-        public PatternMatchContext(T value)
-        {
-            _value = value;
-        }
-
-        public PatternMatch<T, TResult> With<TResult>(Predicate<T> condition, Func<T, TResult> result)
-        {
-            var match = new PatternMatch<T, TResult>(_value);
-            return match.With(condition, result);
-        }
+        void Then(Func<T,TResult> action);
     }
 
-    public static class PatternMatchExceptions
+    public interface IPatternMatcher<out T, in TResult>
     {
-        public static PatternMatchContext<T> Match<T>(this T value)
+        IPatternAction<T,TResult> Case(Func<T, bool> predicate);
+        void Else(Func<T, TResult> action); 
+    }
+
+    public static class PatternMatchExtensions
+    {
+        
+        private class PatternMatcherInfo<T, TResult> : IPatternMatcher<T, TResult>, IPatternAction<T,TResult>
         {
-            return new PatternMatchContext<T>(value);
+            private Func<T, bool> _case;            
+            private Func<T,TResult> _action;
+            private Func<T, TResult> _else;
+            private readonly T _value;
+            public PatternMatcherInfo(T value)
+            {
+                _value = value;
+            }
+            
+            IPatternAction<T, TResult> IPatternMatcher<T, TResult>.Case(Func<T, bool> predicate)
+            {
+                _case = predicate;
+                return this;
+            }
+
+            void IPatternMatcher<T, TResult>.Else(Func<T, TResult> action)
+            {
+                _else = action;
+            }
+
+            void IPatternAction<T, TResult>.Then(Func<T, TResult> action)
+            {
+                _action = action;
+            }
+
+            internal bool IsCase()
+            {
+                return _case != null && _case(_value);
+            }
+
+            internal bool IsElse()
+            {
+                return _else != null;
+            }
+
+            internal TResult Evaluate()
+            {
+                if (IsCase())
+                    return _action(_value);
+                if (IsElse())
+                    return _else(_value);
+                return default(TResult);
+            }
+
+        }
+
+        public static TResult Match<T, TResult>(this T value, params Action<IPatternMatcher<T,TResult>>[] cases)
+        {
+            foreach (var aCase in cases)
+            {
+                var newCase = new PatternMatcherInfo<T, TResult>(value);
+                aCase(newCase);
+                if (newCase.IsCase() || newCase.IsElse())
+                    return newCase.Evaluate();
+            }
+            throw new MatchNotFoundException("Incomplete Pattern Match");
         }
     }
 }
