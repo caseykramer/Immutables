@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Immutables", "Immutables\Immutables.csproj", "{E717E43A-ED9E-4E32-A0C9-15A4FB654B11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Immutables.Tests", "Immutables.Tests\Immutables.Tests.csproj", "{E3FF79B8-8367-4958-A8ED-C39CCACCFA6E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E717E43A-ED9E-4E32-A0C9-15A4FB654B11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E717E43A-ED9E-4E32-A0C9-15A4FB654B11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E717E43A-ED9E-4E32-A0C9-15A4FB654B11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E717E43A-ED9E-4E32-A0C9-15A4FB654B11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3FF79B8-8367-4958-A8ED-C39CCACCFA6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3FF79B8-8367-4958-A8ED-C39CCACCFA6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3FF79B8-8367-4958-A8ED-C39CCACCFA6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3FF79B8-8367-4958-A8ED-C39CCACCFA6E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
